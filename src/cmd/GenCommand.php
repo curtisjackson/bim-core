@@ -563,6 +563,113 @@ class GenCommand extends BaseCommand
         );
     }
 
+    /**
+     *
+     *
+     * IblockSectionField
+     *
+     *
+     */
+
+    /**
+     * genIblockSectionFieldAdd
+     * @param array $args
+     * @param array $options
+     */
+    public function genIblockSectionFieldAdd(array $args, array $options = array())
+    {
+        $params = $this->askIblockSectionFieldParams($options);
+
+        # get description options
+        $desc = (isset($options['d'])) ? $options['d'] : "";
+
+        # set
+        $autoTag = "add";
+        $this->_save(
+            $this->generateObject->generateAddCode($params),
+            $this->generateObject->generateDeleteCode($params)
+            , $desc,
+            $autoTag
+        );
+    }
+
+    /**
+     * genIblockSectionFieldDelete
+     * @param array $args
+     * @param array $options
+     */
+    public function genIblockSectionFieldDelete(array $args, array $options = array())
+    {
+        $params = $this->askIblockSectionFieldParams($options);
+
+        # get description options
+        $desc = (isset($options['d'])) ? $options['d'] : "";
+
+        # set
+        $autoTag = "delete";
+        $this->_save(
+            $this->generateObject->generateDeleteCode($params),
+            $this->generateObject->generateAddCode($params)
+            , $desc,
+            $autoTag
+        );
+    }
+
+    /**
+     * Запрос кода инфоблока и имени пользовательского поля раздела
+     *
+     * askIblockSectionFieldParams
+     * @param array $options
+     * @return array
+     */
+    private function askIblockSectionFieldParams(array $options = array())
+    {
+        $iBlock = new \CIBlock();
+        $dialog = new \ConsoleKit\Widgets\Dialog($this->console);
+        $code = (isset($options['code'])) ? $options['code'] : false;
+        $iblockData = false;
+
+        if ($code) {
+            $iblockData = $iBlock->GetList(array(), array('CODE' => $code, 'CHECK_PERMISSIONS' => 'N'))->Fetch();
+        }
+        if (!$iblockData) {
+            $do = true;
+            while ($do) {
+                $desk = "Put code information block - no default/required";
+                $code = $dialog->ask($desk . PHP_EOL . $this->color('[IBLOCK_CODE]:', \ConsoleKit\Colors::YELLOW), '',
+                    false);
+                $iblockData = strlen($code) ? $iBlock->GetList(array(),
+                    array('CODE' => $code, 'CHECK_PERMISSIONS' => 'N'))->Fetch() : false;
+                if ($iblockData) {
+                    $do = false;
+                } else {
+                    $this->error('Iblock with code = "' . $code . '" not exist.');
+                }
+            }
+        }
+
+        $fieldName = (isset($options['fieldName'])) ? $options['fieldName'] : false;
+        if (!$fieldName) {
+            $do = true;
+            while ($do) {
+                $desk = "Put section user field name - no default/required";
+                $fieldName = $dialog->ask($desk . PHP_EOL . $this->color('[FIELD_NAME]:',
+                        \ConsoleKit\Colors::YELLOW), '', false);
+                $userFieldDbRes = \CUserTypeEntity::GetList(array(), array(
+                    'ENTITY_ID' => 'IBLOCK_' . $iblockData['ID'] . '_SECTION',
+                    'FIELD_NAME' => $fieldName,
+                ));
+                if (strlen($fieldName) && $userFieldDbRes->Fetch()) {
+                    $do = false;
+                } else {
+                    $this->error('Section user field with name = "' . $fieldName . '" not exist.');
+                }
+            }
+        }
+
+        return array('iblockCode' => $code, 'fieldName' => $fieldName);
+    }
+
 
     /**
      *

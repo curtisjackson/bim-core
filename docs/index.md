@@ -20,6 +20,7 @@
     * [IblockType](#iblocktype)
     * [Iblock](#iblock)
     * [IblockProperty](#iblockproperty)
+    * [IblockSectionField](#iblocksectionfield)
     * [Hlblock](#hlblock)
     * [HlblockField](#hlblockfield)
     * Модуль (main)
@@ -313,7 +314,28 @@ php bim gen IblockProperty:add
 php bim gen IblockProperty:add --code=goods --propertyCode=NEW_ITEM --d="new description #iws-123"
 ``` 
 
-### <a name="hlblock"></a>2.4 Hlblock *( php bim gen Hlblock:[add|delete] )*:
+### <a name="iblocksectionfield"></a>2.4 IblockSectionField *( php bim gen IblockSectionField:[add|delete] )*:
+
+Создается Миграционный код "**Пользовательского поля разделов ИБ (UserField)**"
+
+Дополнительно запрашивается:
+- [IBLOCK_CODE]
+- [FIELD_NAME]
+- [Description]
+
+**Пример:**
+``` bash  
+php bim gen IblockSectionField:add
+``` 
+Также возможно передать iblock code, field name и description опционально:
+``` bash  
+php bim gen IblockSectionField:add --code=goods --fieldName=UF_BANNER_TEXT --d="new description #iws-123"
+```
+
+В миграцию инфоблок попадает по символьному коду, а не по id (`ENTITY_ID` вида `IBLOCK_<ID>_SECTION` вычисляется при выполнении), поэтому у инфоблока должен быть заполнен `CODE`.
+Для полей типа «Привязка к элементам/разделам инфоблока» связанный инфоблок также сохраняется по коду, для полей типа «Список» — сохраняются значения списка.
+
+### <a name="hlblock"></a>2.5 Hlblock *( php bim gen Hlblock:[add|delete] )*:
 
 Создается Миграционный код "**Highloadblock**" включая созданные для него *(UserFields)*
 
@@ -330,7 +352,7 @@ php bim gen Hlblock:add
 php bim gen Hlblock:add --id=82 --d="new description #iws-123"
 ``` 
 
-### <a name="hlblockfield"></a>2.5 HlblockField *( php bim gen HlblockField:[add|delete] )*:
+### <a name="hlblockfield"></a>2.6 HlblockField *( php bim gen HlblockField:[add|delete] )*:
 
 Создается Миграционный код "**HighloadblockField (UserField)**"
 
@@ -348,7 +370,7 @@ php bim gen HlblockField:add
 php bim gen HlblockField:add --hlblockid=93 --hlFieldId=582 --d="new description #iws-123"
 ```
 
-### <a name="main_group"></a>2.6 Group *( php bim gen Group:[add|delete] )*:
+### <a name="main_group"></a>2.7 Group *( php bim gen Group:[add|delete] )*:
 
 Создается Миграционный код "**Group (Группы пользователей)**"
 
@@ -365,7 +387,7 @@ php bim gen Group:add
 php bim gen Group:add --id=5 --d="new description #iws-123"
 ```
 
-### <a name="main_site"></a>2.7 Site *( php bim gen Site:[add|delete] )*:
+### <a name="main_site"></a>2.8 Site *( php bim gen Site:[add|delete] )*:
 
 Создается Миграционный код "**Site (Сайты)**"
 
@@ -382,7 +404,7 @@ php bim gen Site:add
 php bim gen Site:add --id=s1 --d="new description #iws-123"
 ```
 
-### <a name="main_language"></a>2.8 Language *( php bim gen Language:add )*:
+### <a name="main_language"></a>2.9 Language *( php bim gen Language:add )*:
 
 Создается Миграционный код "**Language (Языки)**". Доступен только режим `add`.
 
@@ -399,7 +421,7 @@ php bim gen Language:add
 php bim gen Language:add --id=en --d="new description #iws-123"
 ```
 
-### <a name="main_event_type"></a>2.9 EventType *( php bim gen EventType:[add|delete] )*:
+### <a name="main_event_type"></a>2.10 EventType *( php bim gen EventType:[add|delete] )*:
 
 Создается Миграционный код "**EventType (Почтовые события)**" — тип почтового события на всех языках включая созданные для него *(почтовые шаблоны)*.
 

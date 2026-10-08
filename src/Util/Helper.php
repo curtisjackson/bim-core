@@ -53,7 +53,7 @@ class Helper
         $group = new \CGroup();
         $groupOrder = array('sort' => 'asc');
         $groupTmp = 'sort';
-        $groupQuery = $group->GetList($groupOrder, $groupTmp);
+        $groupQuery = $group->GetList(($by="c_sort"), ($order="desc"));
         $groups = array();
         for ($i = 0; $item = $groupQuery->Fetch(); $i++) {
             $groups[$i] = $item;

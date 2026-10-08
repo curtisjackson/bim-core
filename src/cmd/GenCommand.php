@@ -776,6 +776,84 @@ class GenCommand extends BaseCommand
         );
     }
 
+    /**
+     *
+     * EventType
+     *
+     */
+
+    /**
+     * genEventTypeAdd
+     * @param array $args
+     * @param array $options
+     */
+    public function genEventTypeAdd(array $args, array $options = array())
+    {
+        $dialog = new \ConsoleKit\Widgets\Dialog($this->console);
+        $eventName = (isset($options['eventName'])) ? $options['eventName'] : false;
+
+        if (!$eventName) {
+            $do = true;
+            while ($do) {
+                $desk = "Put event type name - no default/required";
+                $eventName = $dialog->ask($desk . PHP_EOL . $this->color('[EVENT_NAME]:', \ConsoleKit\Colors::YELLOW),
+                    '', false);
+                $eventTypeDbRes = \CEventType::GetList(array('EVENT_NAME' => $eventName));
+                if (strlen($eventName) && $eventTypeDbRes && $eventTypeDbRes->Fetch()) {
+                    $do = false;
+                } else {
+                    $this->error('Event type with name = "' . $eventName . '" not exist.');
+                }
+            }
+        }
+        # get description options
+        $desc = (isset($options['d'])) ? $options['d'] : "";
+
+        $autoTag = "add";
+        $this->_save(
+            $this->generateObject->generateAddCode($eventName),
+            $this->generateObject->generateDeleteCode($eventName)
+            , $desc,
+            $autoTag
+        );
+    }
+
+    /**
+     * genEventTypeDelete
+     * @param array $args
+     * @param array $options
+     */
+    public function genEventTypeDelete(array $args, array $options = array())
+    {
+        $dialog = new \ConsoleKit\Widgets\Dialog($this->console);
+        $eventName = (isset($options['eventName'])) ? $options['eventName'] : false;
+
+        if (!$eventName) {
+            $do = true;
+            while ($do) {
+                $desk = "Put event type name - no default/required";
+                $eventName = $dialog->ask($desk . PHP_EOL . $this->color('[EVENT_NAME]:', \ConsoleKit\Colors::YELLOW),
+                    '', false);
+                $eventTypeDbRes = \CEventType::GetList(array('EVENT_NAME' => $eventName));
+                if (strlen($eventName) && $eventTypeDbRes && $eventTypeDbRes->Fetch()) {
+                    $do = false;
+                } else {
+                    $this->error('Event type with name = "' . $eventName . '" not exist.');
+                }
+            }
+        }
+        # get description options
+        $desc = (isset($options['d'])) ? $options['d'] : "";
+
+        $autoTag = "delete";
+        $this->_save(
+            $this->generateObject->generateDeleteCode($eventName),
+            $this->generateObject->generateAddCode($eventName)
+            , $desc,
+            $autoTag
+        );
+    }
+
 
     /**
      *

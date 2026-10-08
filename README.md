@@ -26,6 +26,7 @@
     * [Group](#main_group)
     * [Site](#main_site)
     * [Language](#main_language)
+    * [EventType](#main_event_type)
   * [Режим multi - bim gen multi](#multi)
   * [Тегирование миграций](#tag)
   * [Логирование](#logging)
@@ -397,6 +398,27 @@ php bim gen Language:add
 ``` bash  
 php bim gen Language:add --id=en --d="new description #iws-123"
 ```
+
+### <a name="main_event_type"></a>2.9 EventType *( php bim gen EventType:[add|delete] )*:
+
+Создается Миграционный код "**EventType (Почтовые события)**" — тип почтового события на всех языках включая созданные для него *(почтовые шаблоны)*.
+
+Дополнительно запрашивается:
+- [EVENT_NAME]
+- [Description]
+
+**Пример:**
+``` bash  
+php bim gen EventType:add
+``` 
+Также возможно передать event name и description опционально:
+``` bash  
+php bim gen EventType:add --eventName=UPDATE_PRICES_OF_PROGRAMS --d="new description #iws-123"
+```
+
+В `up()` создаются записи типа события для каждого языка (`EventTypeIntegrate::Add`) и почтовые шаблоны с привязкой к тем же сайтам (`EventMessageIntegrate::Add`).
+В `down()` тип события удаляется вместе со всеми его почтовыми шаблонами (`EventTypeIntegrate::Delete`).
+Вложения почтовых шаблонов (файлы) в миграцию не переносятся.
 
 
 > Обратите внимание!

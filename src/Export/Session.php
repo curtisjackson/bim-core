@@ -155,7 +155,7 @@ class Session extends \BaseCommand
      */
     public function dumpMysql()
     {
-        require_once($_SERVER["DOCUMENT_ROOT"] . "/vendor/cjp2600/bim-core/src/Export/Dump/dump.php");
+        require_once(__DIR__ . "/Dump/dump.php");
 
         if (!defined("START_EXEC_TIME")) {
             define("START_EXEC_TIME", microtime(true));

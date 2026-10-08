@@ -1,5 +1,5 @@
 {
-  "name": "cjp2600/bim-core",
+  "name": "curtisjackson/bim-core",
   "description": "Bitrix db migration core libs",
   "keywords": [
     "bitrix",
@@ -30,6 +30,9 @@
     "maximebf/consolekit": ">=1.0.0",
     "wp-cli/php-cli-tools": "*",
     "alchemy/zippy": ">=0.3.5"
+  },
+  "replace": {
+    "cjp2600/bim-core": "self.version"
   },
   "support": {
     "email": "icjp2600@gmail.com",

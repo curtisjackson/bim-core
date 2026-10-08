@@ -850,7 +850,7 @@ class GenCommand extends BaseCommand
                 foreach ($up[$it] as $row) {
                     # set
                     $tmpDesc = $desc . " #" . $it;
-                    $migrationName = $this->getMigrationName() + ($i * 60);
+                    $migrationName = $this->getMigrationName();
                     $this->saveTemplate($migrationName,
                         $this->setTemplate(
                             $migrationName,

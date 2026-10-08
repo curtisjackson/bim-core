@@ -56,6 +56,9 @@ class UpdateCommand extends BaseCommand
         $list = $this->getDirectoryTree($this->getMigrationPath(), "php");
         ksort($list); # по возрастанию
         if (!empty($list)) {
+            $return_array_new = array();
+            $return_array_apply = array();
+
             foreach ($list as $id => $data) {
                 $row = $data['file'];
                 $name = $data['name'];
@@ -134,6 +137,9 @@ class UpdateCommand extends BaseCommand
                     $return_array_new = array();
                 }
             }
+
+            # check date period
+            $return_array_new = $this->filterByDate($return_array_new, $options, $is_filter);
 
             if (!$is_filter) {
                 $this->askDoOperation((isset($options['force'])));

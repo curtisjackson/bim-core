@@ -113,6 +113,9 @@ abstract class BaseCommand extends Command
         }
 
         $save_file = $migration_path . $filename . '.php';
+        if (file_exists($save_file)) {
+            throw new Exception("Migration file " . $save_file . " already exists");
+        }
         $newFile = fopen($save_file, 'w');
         fwrite($newFile, $template);
         fclose($newFile);
@@ -228,12 +231,39 @@ abstract class BaseCommand extends Command
     }
 
     /**
+     * Получение id (имени) новой миграции.
+     * Id — timestamp создания, но не меньше последнего существующего id + 1:
+     * так id растут в порядке создания и не совпадают с уже созданными миграциями
+     * (например, при генерации нескольких миграций в течение одной секунды в режиме multi).
+     *
      * getMigrationName
-     * @return string
+     * @return int
      */
     public function getMigrationName()
     {
-        return time();
+        $name = time();
+        $lastId = $this->getLastMigrationId();
+        if ($lastId >= $name) {
+            $name = $lastId + 1;
+        }
+        return $name;
+    }
+
+    /**
+     * Получение максимального id среди файлов миграций
+     *
+     * getLastMigrationId
+     * @return int
+     */
+    public function getLastMigrationId()
+    {
+        $lastId = 0;
+        foreach (scandir($this->getMigrationPath()) as $file) {
+            if (preg_match('/^(\d+)\.php$/', $file, $matches) && (int)$matches[1] > $lastId) {
+                $lastId = (int)$matches[1];
+            }
+        }
+        return $lastId;
     }
 
     /**
@@ -605,6 +635,63 @@ abstract class BaseCommand extends Command
     {
         # check migration table
         return Bim\Db\Entity\MigrationsTable::isExistsInTable($migration_id);
+    }
+
+    /**
+     * Фильтрация списка миграций по дате создания (опции --from / --to).
+     * Id миграции — timestamp создания, поэтому сравнивается с датами напрямую.
+     *
+     * filterByDate
+     * @param array $list : список миграций, ключ — id миграции
+     * @param array $options
+     * @param bool $is_filter : выставляется в true, если фильтр задан
+     * @return array
+     * @throws \Bim\Exception\BimException
+     */
+    public function filterByDate($list, $options, &$is_filter)
+    {
+        $filter_from = (isset($options['from'])) ? $this->parseFilterDate($options['from'], 'from') : false;
+        $filter_to = (isset($options['to'])) ? $this->parseFilterDate($options['to'], 'to') : false;
+
+        if (!$filter_from && !$filter_to) {
+            return $list;
+        }
+
+        $is_filter = true;
+        $this->padding("Filter by date:" . $this->color(PHP_EOL .
+                "from: " . (($filter_from) ? $options['from'] : "-") . PHP_EOL .
+                "to: " . (($filter_to) ? $options['to'] : "-"), Colors::YELLOW));
+
+        $newArrayList = array();
+        foreach ($list as $id => $data) {
+            if ($filter_from && $id < $filter_from) {
+                continue;
+            }
+            if ($filter_to && $id > $filter_to) {
+                continue;
+            }
+            $newArrayList[$id] = $data;
+        }
+        return $newArrayList;
+    }
+
+    /**
+     * Разбор даты из опции фильтра. Некорректная дата — исключение,
+     * иначе фильтр молча не применится и команда затронет все миграции.
+     *
+     * parseFilterDate
+     * @param mixed $value
+     * @param string $optionName
+     * @return int
+     * @throws \Bim\Exception\BimException
+     */
+    public function parseFilterDate($value, $optionName)
+    {
+        $time = (is_string($value)) ? strtotime($value) : false;
+        if ($time === false) {
+            throw new \Bim\Exception\BimException('Invalid date in --' . $optionName . '. Example: --' . $optionName . '="29.01.2015 00:01"');
+        }
+        return $time;
     }
 
     /**

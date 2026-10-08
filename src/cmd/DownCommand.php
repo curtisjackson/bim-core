@@ -47,6 +47,9 @@ class DownCommand extends BaseCommand
         $list = $this->getDirectoryTree($this->getMigrationPath(), "php");
         krsort($list); #по убыванию
         if (!empty($list)) {
+            $return_array_new = array();
+            $return_array_apply = array();
+
             foreach ($list as $id => $data) {
                 $row = $data['file'];
                 $name = $data['name'];
@@ -125,6 +128,9 @@ class DownCommand extends BaseCommand
                     $return_array_apply = array();
                 }
             }
+
+            # check date period
+            $return_array_apply = $this->filterByDate($return_array_apply, $options, $is_filter);
 
             if (!$is_filter) {
                 $this->askDoOperation((isset($options['force'])),"Are you sure you want to remove all applied migration");

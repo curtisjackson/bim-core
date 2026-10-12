@@ -48,13 +48,14 @@ class HighloadblockFieldIntegrate
 
         #if
         if (($fields['USER_TYPE_ID'] == "iblock_element" || $fields['USER_TYPE_ID'] == "iblock_section") && (isset($fields['SETTINGS']['IBLOCK_CODE']))) {
+            $linkIblockCode = $fields['SETTINGS']['IBLOCK_CODE'];
             unset($fields['SETTINGS']['IBLOCK_CODE']);
             $rsIBlock = \CIBlock::GetList(array(),
-                array('CODE' => $fields['SETTINGS']['IBLOCK_CODE'], 'CHECK_PERMISSIONS' => 'N'));
+                array('CODE' => $linkIblockCode, 'CHECK_PERMISSIONS' => 'N'));
             if ($arIBlock = $rsIBlock->Fetch()) {
                 $fields['SETTINGS']['IBLOCK_ID'] = $arIBlock['ID'];
             } else {
-                throw new \Exception(__METHOD__ . ' Not found iblock with code ' . $fields['SETTINGS']['IBLOCK_CODE']);
+                throw new \Exception(__METHOD__ . ' Not found iblock with code ' . $linkIblockCode);
             }
         }
 

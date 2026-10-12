@@ -38,19 +38,24 @@ class InfoCommand extends BaseCommand
         $info_text = $MESS["EPILOG_ADMIN_SM_" . $vendor] . " (" . SM_VERSION . ")";
         $return[] = Colors::colorize('Version:', Colors::YELLOW) . " " . $info_text;
 
-        $url = "https://packagist.org/search.json?q=bim";
-        $json = file_get_contents($url);
-        $data = json_decode($json);
+        # ищем по точному имени: поиск по "bim" отдаёт только первую страницу, и пакета в ней может не быть
+        $package = "curtisjackson/bim-core";
+        $url = "https://packagist.org/search.json?q=" . urlencode($package);
+        $context = stream_context_create(array('http' => array('timeout' => 5)));
+        $json = @file_get_contents($url, false, $context);
+        $data = ($json !== false) ? json_decode($json) : null;
 
         $dataPack = null;
-        foreach ($data->results as $item) {
-            if ($item->name == "cjp2600/bim-core") {
-                $dataPack = $item;
+        if (isset($data->results) && is_array($data->results)) {
+            foreach ($data->results as $item) {
+                if ($item->name == $package) {
+                    $dataPack = $item;
+                }
             }
         }
 
         if (is_null($dataPack)) {
-            $info_text = PHP_EOL . 'Bitrix migration (BIM) ' . PHP_EOL . 'http://cjp2600.github.io/bim-core' . PHP_EOL;
+            $info_text = PHP_EOL . 'Bitrix migration (BIM) ' . PHP_EOL . 'https://github.com/' . $package . PHP_EOL;
         } else {
             $info_text = PHP_EOL . 'Bitrix migration (BIM)' . PHP_EOL;
             foreach ((array)$dataPack as $key => $val) {

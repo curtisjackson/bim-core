@@ -97,7 +97,7 @@ class ListCommand extends BaseCommand
                     ConsoleKit\Colors::colorize($i, $color),
                     ConsoleKit\Colors::colorize($id, $color),
                     $data['author'],
-                    date("d.m.y G:h", $data['date'])
+                    date("d.m.y H:i", $data['date'])
                 );
                 if ($file) {
                     $rowArray[] = $row;
